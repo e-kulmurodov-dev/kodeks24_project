@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import dotenv
+from celery import Celery
 from dotenv import load_dotenv
 from datetime import timedelta
 load_dotenv()
@@ -28,6 +29,8 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'rest_framework_simplejwt',
+    'django_celery_results',
+
 
 ]
 
@@ -217,11 +220,19 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    }
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
+    'TITLE': 'kodeks24',
+    'DESCRIPTION': 'kodeks24 beta test',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
@@ -267,10 +278,25 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
+#----- email --------
+EMAIL_BACKEND=os.getenv("EMAIL_BACKEND")
+EMAIL_HOST=os.getenv("EMAIL_HOST")
+EMAIL_PORT=os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS=os.getenv("EMAIL_USE_TLS")
+EMAIL_HOST_USER=os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD=os.getenv("EMAIL_HOST_PASSWORD")
 
-EMAIL_BACKEND=os.getenv('EMAIL_BACKEND')
-EMAIL_HOST=os.getenv('EMAIL_HOST')
-EMAIL_PORT=os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS=os.getenv('EMAIL_USE_TLS')
-EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
+
+
+# CELERY SETTINGS
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv('REDIS_URL', 'redis://127.0.0.1:6374'),
+        "KEY_PREFIX": "django"
+    }
+}
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = 'django-db'

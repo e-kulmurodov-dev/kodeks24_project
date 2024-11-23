@@ -16,6 +16,9 @@ pillow = "^11.0.0"
 django-ckeditor-5 = "^0.2.14"
 psycopg2-binary = "^2.9.9"
 python-dotenv = "^1.0.1"
+redis = "^5.2.0"
+celery = {extras = ["redis"], version = "^5.4.0"}
+django-celery-results = "^2.5.1"
 
 
 [build-system]

@@ -9,6 +9,6 @@ urlpatterns = [
                   path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
                   path('admin/', admin.site.urls),
                   path('api/v1/', include('apps.urls')),
-                   path('ckeditor5/', include('django_ckeditor_5.urls')),
+                  path('ckeditor5/', include('django_ckeditor_5.urls')),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

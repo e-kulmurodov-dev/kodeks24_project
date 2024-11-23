@@ -1,4 +1,5 @@
-from django.db.models import Model, CharField, IntegerField, ForeignKey, CASCADE, ImageField, PositiveIntegerField
+from django.db.models import Model, CharField, IntegerField, ForeignKey, CASCADE, ImageField, PositiveIntegerField, \
+    DateTimeField
 from django_ckeditor_5.fields import CKEditor5Field
 
 from apps.models import SlugBaseModel, TimeBaseModel
@@ -18,4 +19,22 @@ class ProductImage(Model):
     image = ImageField(upload_to='product/images/%Y/%m/%d')
     product = ForeignKey('apps.Product', CASCADE)
 
+    def __str__(self):
+        return f"Image for {self.product.name}"
 
+class Wishlist(TimeBaseModel):
+    product = ForeignKey("apps.Product", CASCADE)
+    user = ForeignKey("apps.CustomUser", CASCADE)
+
+    class Meta:
+        unique_together = ('product', 'user')
+
+
+class Cart(Model):
+    user = ForeignKey('CustomUser', on_delete=CASCADE, related_name='cart')
+    product = ForeignKey(Product, on_delete=CASCADE, related_name='cart')
+    quantity = PositiveIntegerField(default=1)
+    added_on = DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
